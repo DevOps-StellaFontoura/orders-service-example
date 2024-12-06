@@ -2,7 +2,7 @@
 FROM maven:3.8.5-openjdk-17-slim AS builder
 
 # Instalar curl para realizar peticiones HTTP
-RUN apk --no-cache add curl
+RUN apt-get update && apt-get install -y curl && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Establecer el directorio de trabajo para el build
 WORKDIR /app
