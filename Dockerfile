@@ -23,4 +23,5 @@ COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 8083
 
 # Comando para ejecutar la aplicación
-CMD ["java", "-jar", "app.jar", "http://localhost:8080/", "http://localhost:8082/", "http://localhost:8081/"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
+CMD ["ecs-backend-lb-payments-prod-709144236.us-east-1.elb.amazonaws.com", "ecs-backend-lb-shipping-prod-1930982188.us-east-1.elb.amazonaws.com", "ecs-backend-lb-products-prod-446207299.us-east-1.elb.amazonaws.com"]
