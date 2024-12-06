@@ -1,6 +1,9 @@
 # Paso 1: Construir la aplicación
 FROM maven:3.8.5-openjdk-17-slim AS builder
 
+# Instalar curl para realizar peticiones HTTP
+RUN apk --no-cache add curl
+
 # Establecer el directorio de trabajo para el build
 WORKDIR /app
 
@@ -23,4 +26,4 @@ COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 8083
 
 # Comando para ejecutar la aplicación
-CMD ["java", "-jar", "app.jar", "$URL_PAYMENTS", "$URL_SHIPPING", "$URL_PRODUCTS"]
+CMD ["sh", "-c", "java -jar /app/app.jar \"$URL_PAYMENTS\" \"$URL_SHIPPING\" \"$URL_PRODUCTS\""]
