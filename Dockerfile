@@ -23,4 +23,4 @@ COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 8083
 
 # Comando para ejecutar la aplicación
-CMD ["java", "-jar", "app.jar", "http://localhost:8080/", "http://localhost:8082/", "http://localhost:8081/"]
+CMD ["java", "-jar", "app.jar", "${URL_PAYMENTS}", "${URL_SHIPPING}", "${URL_PRODUCTS}"]

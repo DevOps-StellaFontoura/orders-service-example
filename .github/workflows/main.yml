@@ -39,6 +39,23 @@ jobs:
              echo "uri=${{ vars.URI_ECR_ORDERS_DEV }}" >> $GITHUB_ENV
           fi
 
+      # Determinar URI demas Apps para pasar como argumento en Dockerfile
+      - name: Set environment variables
+        run: |
+          if [[ "${{ github.ref_name }}" == "main" ]]; then
+            echo "URL_PAYMENTS=${{ vars.URI_ECS_PAYMENTS_PROD }}" >> $GITHUB_ENV
+            echo "URL_SHIPPING=${{ vars.URI_ECS_SHIPPING_PROD }}" >> $GITHUB_ENV
+            echo "URL_PRODUCTS=${{ vars.URI_ECS_PRODUCTS_PROD }}" >> $GITHUB_ENV
+          elif [[ "${{ github.ref_name }}" == "staging" ]]; then
+            echo "URL_PAYMENTS=${{ vars.URI_ECR_ORDERS_QA }}" >> $GITHUB_ENV
+            echo "URL_SHIPPING=${{ vars.URI_ECS_SHIPPING_QA }}" >> $GITHUB_ENV
+            echo "URL_PRODUCTS=${{ vars.URI_ECS_PRODUCTS_QA }}" >> $GITHUB_ENV
+          else
+            echo "URL_PAYMENTS=${{ vars.URI_ECS_PAYMENTS_DEV }}" >> $GITHUB_ENV
+            echo "URL_SHIPPING=${{ vars.URI_ECS_SHIPPING_DEV }}" >> $GITHUB_ENV
+            echo "URL_PRODUCTS=${{ vars.URI_ECS_PRODUCTS_DEV }}" >> $GITHUB_ENV
+          fi
+
       # Construcción de la imagen Docker
       - name: Build Docker Image
         run: docker build -t orders-service:latest .
