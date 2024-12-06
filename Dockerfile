@@ -23,4 +23,4 @@ COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 8083
 
 # Comando para ejecutar la aplicación
-CMD ["java", "-jar", "app.jar", ${URL_PAYMENTS}, ${URL_SHIPPING}, ${URL_PRODUCTS}]
+CMD ["sh", "-c", "java -jar /app/app.jar \"$URL_PAYMENTS\" \"$URL_SHIPPING\" \"$URL_PRODUCTS\""]
