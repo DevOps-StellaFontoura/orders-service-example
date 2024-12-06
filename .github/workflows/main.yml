@@ -1,0 +1,77 @@
+name: Build Docker Image and upload to AWS
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+      - development
+jobs:
+  build-docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout del repositorio
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Determinar el ambiente en base a la rama
+      - name: Determine Environment
+        id: env
+        run: |
+          if [[ "${{ github.ref_name }}" == "main" ]]; then
+            echo "env=prod" >> $GITHUB_ENV
+          elif [[ "${{ github.ref_name }}" == "staging" ]]; then
+            echo "env=qa" >> $GITHUB_ENV
+          elif [[ "${{ github.ref_name }}" == "development" ]]; then
+            echo "env=dev" >> $GITHUB_ENV
+          fi
+
+      # Determinar URI
+      - name: Set ECR URI
+        id: ecr-uri
+        run: |
+          if [[ "${{ github.ref_name }}" == "main" ]]; then
+             echo "uri=${{ vars.URI_ECR_ORDERS_PROD }}" >> $GITHUB_ENV
+          elif [[ "${{ github.ref_name }}" == "staging" ]]; then
+             echo "uri=${{ vars.URI_ECR_ORDERS_QA }}" >> $GITHUB_ENV
+          elif [[ "${{ github.ref_name }}" == "development" ]]; then
+             echo "uri=${{ vars.URI_ECR_ORDERS_DEV }}" >> $GITHUB_ENV
+          fi
+
+      # Construcción de la imagen Docker
+      - name: Build Docker Image
+        run: docker build -t orders-service:latest .
+
+      # Login Amazon ECR
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+          AWS_REGION: "us-east-1"
+
+      # Etiquetar la imagen Docker con la URI del ambiente correspondiente
+      - name: Tag Docker image
+        run: docker tag orders-service:latest ${{ env.uri }}:${{ env.env }}
+        env:
+          uri: ${{ env.uri }}
+          env: ${{ env.env }}
+
+      - name: Push Docker image to ECR
+        run: docker push ${{ env.uri }}:${{ env.env }}
+        env:
+          uri: ${{ env.uri }}
+          env: ${{ env.env }}
+
+      - name: Deploy to ECS
+        run: aws ecs update-service --cluster backend-cluster-${{ env.env }} --service backend-app-service-orders-${{ env.env }} --force-new-deployment
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+          AWS_REGION: "us-east-1"
+          uri: ${{ env.uri }}
+          env: ${{ env.env }}
