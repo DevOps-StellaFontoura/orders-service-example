@@ -11,6 +11,11 @@ import uy.edu.ort.devops.ordersserviceexample.logic.OrdersLogic;
 public class OrdersServiceExampleApplication {
 
 	public static void main(String[] args) {
+		// Log each argument
+		for (int i = 0; i < args.length; i++) {
+			System.out.println("Argument " + i + ": " + args[i]);
+		}
+
 		OrdersLogic.setPaymentsServiceUrl(args[0]);
 		OrdersLogic.setShippingServiceUrl(args[1]);
 		OrdersLogic.setProductsServiceUrl(args[2]);

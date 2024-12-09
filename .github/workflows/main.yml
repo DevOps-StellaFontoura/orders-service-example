@@ -52,7 +52,7 @@ jobs:
             echo "URL_SHIPPING=${{ vars.URI_ECS_SHIPPING_PROD }}" >> $GITHUB_ENV
             echo "URL_PRODUCTS=${{ vars.URI_ECS_PRODUCTS_PROD }}" >> $GITHUB_ENV
           elif [[ "${{ github.ref_name }}" == "staging" ]]; then
-            echo "URL_PAYMENTS=${{ vars.URI_ECR_ORDERS_QA }}" >> $GITHUB_ENV
+            echo "URL_PAYMENTS=${{ vars.URI_ECS_PAYMENTS_QA }}" >> $GITHUB_ENV
             echo "URL_SHIPPING=${{ vars.URI_ECS_SHIPPING_QA }}" >> $GITHUB_ENV
             echo "URL_PRODUCTS=${{ vars.URI_ECS_PRODUCTS_QA }}" >> $GITHUB_ENV
           else
