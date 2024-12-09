@@ -6,6 +6,11 @@ on:
       - main
       - staging
       - development
+  pull_request:
+    branches:
+      - main
+      - staging
+      - development
 jobs:
   build-docker:
     runs-on: ubuntu-latest
